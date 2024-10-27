@@ -1,5 +1,6 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
+const { buildSubgraphSchema } = require("@apollo/subgraph");
 
 const { readFileSync } = require("fs");
 const axios = require("axios");
@@ -18,11 +19,13 @@ const PaymentsAPI = require("./datasources/payments");
 
 async function startApolloServer() {
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema: buildSubgraphSchema({
+      typeDefs,
+      resolvers,
+    }),
   });
 
-  const port = 4000;
+  const port = 4001;
 
   try {
     const { url } = await startStandaloneServer(server, {
@@ -66,3 +69,14 @@ async function startApolloServer() {
 }
 
 startApolloServer();
+
+/* APOLLO_KEY=service:Monolith-Graph-a0m59k:-v3yFTOj6QO_ob8q1Pscjg APOLLO_GRAPH_REF=Monolith-Graph-a0m59k@current ./router --config router-config.yaml */
+
+/* rover subgraph publish Monolith-Graph-a0m59k@current \
+  --schema ./monolith/schema.graphql \
+  --name monolith */
+
+/* rover subgraph publish Monolith-Graph-a0m59k@current \
+    --schema ./subgraph-accounts/schema.graphql \
+    --name accounts \
+    --routing-url http://localhost:4002 */
